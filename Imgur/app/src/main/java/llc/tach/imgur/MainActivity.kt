@@ -7,7 +7,6 @@ import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -37,10 +36,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onQueryTextSubmit(query: String): Boolean {
-                runBlocking {
-                    getImagesBasedOnQuery(query)
-                }
-                adapter.notifyDataSetChanged()
+
+                runOnUiThread { getImagesBasedOnQuery(query) }
+
                 return false
             }
         })
@@ -49,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         linearLayoutManager = LinearLayoutManager(this)
         recyclerView?.layoutManager = linearLayoutManager
 
+        results.add(Imgur("title", "https://imgur.com/a/MD2VQwc.jpg"))
         adapter = RecyclerAdapter(results, this)
         recyclerView?.adapter = adapter
         adapter.onItemClick = { image ->
@@ -84,7 +83,8 @@ class MainActivity : AppCompatActivity() {
                     val item = items.getJSONObject(i)
 
                     val title = item.getString("title")
-                    val url = item.getString("link")
+                    var url = item.getString("link")
+                    url += ".jpg"
                     val imgur = Imgur(title, url)
 
                     Log.v(imgur.title, imgur.imageUrl)
@@ -93,6 +93,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-
+        adapter.notifyDataSetChanged()
     }
 }
