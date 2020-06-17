@@ -1,5 +1,6 @@
 package llc.tach.imgur
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.SearchView
@@ -40,6 +41,13 @@ class MainActivity : AppCompatActivity() {
         recyclerView?.layoutManager = linearLayoutManager
 
         adapter = RecyclerAdapter(results, this)
+        adapter.onItemClick = { image ->
+            val intent = Intent(this, FullImageActivity::class.java).apply {
+                putExtra("Url", image.imageUrl)
+            }
+            startActivity(intent)
+        }
+
         recyclerView?.adapter = adapter
         adapter.notifyDataSetChanged()
 
